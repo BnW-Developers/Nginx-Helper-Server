@@ -92,7 +92,6 @@ export class Stream {
       _children: [],
       listen: port,
       proxy_pass: `${ip}:3000`,
-      proxy_protocol: 'on',
       proxy_timeout: '60s',
       proxy_connect_timeout: '10s',
     };
