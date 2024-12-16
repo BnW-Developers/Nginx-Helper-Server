@@ -2,16 +2,17 @@ import { exec } from 'child_process';
 import fs from 'fs';
 
 export class Stream {
-  constructor(path) {
-    this.path = path;
+  constructor() {
+    this.confPath = '/usr/local/nginx/conf/nginx.conf';
+    this.banPath = '/usr/local/nginx/conf/ban_ips.conf';
   }
 
-  loadConfig() {
-    return fs.readFileSync(this.path, 'utf-8') || null;
+  loadConfig(path) {
+    return fs.readFileSync(path, 'utf-8') || null;
   }
 
   writeConfig(config) {
-    fs.writeFileSync(this.path, config);
+    fs.writeFileSync(this.confPath, config);
     exec('sudo /usr/local/nginx/sbin/nginx -s reload', (err) => {
       // 리로드
       if (err) {
@@ -90,13 +91,15 @@ export class Stream {
     const serverData = {
       _typeName: 'server',
       _children: [],
+      include: '/usr/local/nginx/conf/ban_ips.conf',
       listen: port,
       proxy_pass: `${ip}:3000`,
+      proxy_protocol: 'on',
       proxy_timeout: '60s',
       proxy_connect_timeout: '10s',
     };
 
-    let conf = this.loadConfig();
+    let conf = this.loadConfig(this.confPath);
     if (!conf) throw new Error('conf 파일을 로드하는데에 실패하였습니다.');
 
     const json = this.configToJson(conf);
@@ -117,7 +120,7 @@ export class Stream {
   }
 
   deleteServerList(port) {
-    let conf = this.loadConfig();
+    let conf = this.loadConfig(this.confPath);
     if (!conf) throw new Error('conf 파일을 로드하는데에 실패하였습니다.');
 
     const json = this.configToJson(conf);
@@ -138,5 +141,21 @@ export class Stream {
     this.writeConfig(conf);
     // 삭제요청한 포트 정보 반환
     return deletedServer;
+  }
+
+  addBanList(ip, comment = 'abnormal client or bot') {
+    try {
+      fs.appendFileSync(this.banPath, `deny ${ip}; #${comment}\n`, 'utf8');
+      exec('sudo /usr/local/nginx/sbin/nginx -s reload', (err) => {
+        // 리로드
+        if (err) {
+          console.error(err);
+        } else {
+          console.log('Nginx reloaded');
+        }
+      });
+    } catch (err) {
+      console.error(err.message);
+    }
   }
 }

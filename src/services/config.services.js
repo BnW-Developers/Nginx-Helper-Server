@@ -16,6 +16,12 @@ class ConfigService {
     return this.configModel.setConfig(ip, port);
   }
 
+  // 아이피 밴 conf 추가
+  setBanConfig(ip, comment) {
+    // TODO: 아이피, 포트 검증 추가
+    return this.configModel.setBanConfig(ip, comment);
+  }
+
   deleteConfig(port) {
     // TODO: 저장된 포트인지 검증 추가
     return this.configModel.deleteConfig(port);

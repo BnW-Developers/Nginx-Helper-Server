@@ -25,6 +25,16 @@ export class ConfigController {
     }
   };
 
+  setBanConfig = (req, res, next) => {
+    try {
+      const { ip, comment } = req.body;
+      this.#configService.setBanConfig(ip, comment);
+      return res.status(200).json({ message: '정상 등록' });
+    } catch (err) {
+      next(err);
+    }
+  };
+
   deleteConfig = (req, res, next) => {
     try {
       const { port } = req.body;

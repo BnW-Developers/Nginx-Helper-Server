@@ -2,7 +2,7 @@ import { Stream } from '../utils/nginx/stream.util.js';
 
 export class configModel {
   constructor() {
-    this.stream = new Stream('/usr/local/nginx/conf/nginx.conf');
+    this.stream = new Stream();
   }
   getConfig() {
     return this.stream.loadConfig();
@@ -10,6 +10,10 @@ export class configModel {
 
   setConfig(ip, port) {
     return this.stream.addServerList(ip, port);
+  }
+
+  setBanConfig(ip, comment) {
+    return this.stream.addBanList(ip, comment);
   }
 
   deleteConfig(port) {

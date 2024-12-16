@@ -9,5 +9,6 @@ const configController = new ConfigController();
 router.get('/serverList', authMiddleware, configController.getConfig);
 router.post('/serverList', authMiddleware, configController.setConfig);
 router.delete('/serverList', authMiddleware, configController.deleteConfig);
+router.post('/banList', authMiddleware, configController.setBanConfig);
 
 export default router;
